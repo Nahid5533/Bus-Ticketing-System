@@ -1,0 +1,39 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Trip; // Import the Trip model
+
+class TripController extends Controller
+{
+    // Method to display the trip creation form
+    public function create()
+    {
+        // Fetch locations to populate the dropdown in the form
+        $locations = \App\Location::all(); // Assuming the Location model is in the same namespace
+
+        return view('create_trip', compact('locations'));
+    }
+
+    // Method to handle the trip creation form submission
+    public function store(Request $request)
+    {
+        // Validate form data
+        $validatedData = $request->validate([
+            'trip_date' => 'required|date',
+            'location_id' => 'required|exists:locations,id',
+            // Add validation rules for other form fields as needed
+        ]);
+
+        // Create a new trip record
+        Trip::create([
+            'trip_date' => $validatedData['trip_date'],
+            'location_id' => $validatedData['location_id'],
+            // Assign other form fields to corresponding Trip model fields
+        ]);
+
+        // Redirect after successful creation
+        return redirect()->route('trips.create')->with('success', 'Trip created successfully!');
+    }
+}
